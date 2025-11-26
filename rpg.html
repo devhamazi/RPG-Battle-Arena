@@ -1,185 +1,131 @@
 
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG Battle Arena</title>
-
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RPG</title>
 <style>
-/* === Reset & Body === */
-* { margin:0; padding:0; box-sizing:border-box; }
-
-html, body {
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
-  font-family: 'Share Tech Mono', monospace;
-  color: #fff;
-  background: url('https://raw.githubusercontent.com/zaddiii/RPG-Battle-Arena/main/84edee8e-37c2-444f-8638-be7d820a1bd7.jpeg') no-repeat center center fixed;
-  background-size: cover;
-  background-attachment: fixed;
-}
-
-/* Dark overlay */
-body::before {
-  content: '';
-  position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.6);
-  z-index: -1;
-}
-
-/* Title */
-h1 {
+body {
+  background-color: #001f3f;
+  font-family: "Times New Roman", serif;
+  color: white;
   text-align: center;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
-  color: #fff;
-  margin: 2vh 0;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
-
-/* Scoreboard */
 #scoreboard {
   position: fixed;
-  top: 1.5vh;
-  left: 1.5vw;
-  background: rgba(0,0,0,0.25);
-  padding: 1vh 1.5vw;
-  border-radius: 10px;
-  font-size: clamp(11px, 1.6vw, 14px);
-  line-height: 1.4;
+  top: 10px;
+  left: 10px;
+  background: transparent;
+  font-size: 13px;
   text-align: left;
   z-index: 10;
+  color: #ffffff;
+  line-height: 1.3;
 }
-
-/* Game Area */
 #gameArea {
-  width: min(90vw, 650px);
-  margin: 10vh auto 4vh auto;
-  padding: 2vw;
-  background: transparent; /* removed navy blue background */
+  display: none;
+  margin-top: 20px;
+  max-width: 600px;
+  width: 95%;
+  margin-inline: auto;
+  background-color: rgba(0, 0, 50, 0.5);
+  padding: 15px;
   border-radius: 15px;
+  position: relative;
+  z-index: 5;
 }
-
-/* Bars */
+.bar { transition: width 0.25s ease; }
 .bar-container {
   position: relative;
-  background: #222;
-  border-radius: 10px;
-  height: clamp(18px, 2.5vh, 22px);
-  margin-bottom: 12px;
+  background: #333;
+  border-radius: 8px;
+  height: 14px;
   overflow: hidden;
 }
-.bar {
-  height: 100%;
-  transition: width 0.5s ease;
-}
-#playerHealthBar { background: #f00; }
-#playerManaBar { background: #00f; }
-#enemyHealthBar { background: #f00; }
-#enemyManaBar { background: #00f; }
-#enemyIntelligenceBar { background: #0f0; }
-
 .bar-text {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-size: clamp(11px, 1.6vw, 13px);
-  font-weight: bold;
+  transform: translateY(-50%);
+  right: 6px;
+  font-size: 12px;
   pointer-events: none;
 }
-
-/* Buttons */
-button {
-  padding: clamp(8px, 1.5vh, 12px) clamp(12px, 2vw, 20px);
-  margin: 5px;
-  border-radius: 8px;
-  border: none;
-  background: #ccc;
-  color: #000;
-  font-weight: bold;
-  font-size: clamp(12px, 2vw, 16px);
-  cursor: pointer;
-  transition: 0.15s;
-}
-button:hover {
-  background: #aaa;
-  transform: scale(1.05);
-}
-button:active {
-  transform: scale(0.97);
-}
-
-/* Battle Log */
 #battleLog {
-  background: rgba(0, 0, 0, 0.3); /* black with 30% opacity, more transparent */
-  padding: 10px;
+  background-color: rgba(20, 20, 20, 0.8);
+  color: #ddd;
   border-radius: 10px;
-  height: clamp(120px, 18vh, 160px);
+  padding: 10px;
+  height: 150px;
   overflow-y: auto;
-  font-size: clamp(11px, 1.6vw, 13px);
-  margin-top: 15px;
+  margin-top: 10px;
+  font-size: 13px;
   text-align: left;
 }
-
-#battleLog p {
-  margin-bottom: 6px;
-  opacity: 0;
-  animation: fadeIn 0.4s forwards;
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 15px;
+  margin: 4px;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.15s ease;
 }
-
+button:active { transform: scale(0.97); }
+#alertBox {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #fff;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  font-size: 14px;
+}
+#alertBox.show { opacity: 1; }
 /* Navigation Menu */
 #navMenu {
   position: fixed;
-  bottom: 2vh;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0,0,50,0.8);
   display: flex;
-  gap: 10px;
-  z-index: 10;
+  justify-content: center;
+  padding: 10px 0;
+  gap: 15px;
+  z-index: 20;
 }
-#navMenu button {
-  font-size: clamp(11px, 2vw, 13px);
-  padding: 8px 15px;
-  border-radius: 20px;
-}
+#navMenu button { background: #fff; color:#001f3f; font-weight:bold; }
 
-/* Alert Box */
-#alertBox {
-  position: fixed;
-  top: 6vh;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 8px 16px;
-  background: rgba(0,0,0,0.8);
-  border-radius: 8px;
-  font-weight: bold;
-  color: #fff;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  font-size: clamp(12px, 1.8vw, 14px);
-  z-index: 15;
-}
-#alertBox.show { opacity: 1; }
-
-/* Responsive Scaling */
 @media (max-width: 600px) {
-  h1 { font-size: clamp(1.5rem, 5vw, 2.2rem); }
-  #gameArea { margin: 8vh auto; padding: 4vw; }
-  button { font-size: clamp(11px, 3vw, 14px); }
-  #battleLog { height: 130px; }
+  h1 { font-size: 20px; margin-top: 15px; }
+  #scoreboard { font-size: 12px; top: 5px; left: 5px; }
+  #gameArea { padding: 10px; border-radius: 10px; }
+  button { font-size: 12px; padding: 6px 10px; margin: 3px; }
+  #battleLog { font-size: 12px; height: 120px; }
+  #alertBox { font-size: 12px; padding: 8px 16px; }
+}
+@media (max-width: 400px) {
+  #scoreboard { font-size: 11px; line-height: 1.2; }
+  button { width: 90%; max-width: 220px; display: block; margin: 6px auto; }
 }
 </style>
 </head>
 <body>
-
-<h1>RPG Battle Arena ⚔</h1>
-
+<h1>RPG Battle Arena</h1>
 <div id="scoreboard">
   <p><strong>Player Wins:</strong> <span id="playerWins">0</span></p>
   <p><strong>Enemy Wins:</strong> <span id="enemyWins">0</span></p>
@@ -190,33 +136,43 @@ button:active {
 
 <div id="gameArea">
   <p><strong>🧑‍🎮 Player</strong></p>
-  <div class="bar-container"><div id="playerHealthBar" class="bar" style="width:100%;"></div><span id="playerHealthText" class="bar-text">200 / 200</span></div>
-  <div class="bar-container"><div id="playerManaBar" class="bar" style="width:100%;"></div><span id="playerManaText" class="bar-text">50 / 50</span></div>
-
-  <p style="margin-top:12px;"><strong>👾 Enemy</strong></p>
-  <div class="bar-container"><div id="enemyHealthBar" class="bar" style="width:100%;"></div><span id="enemyHealthText" class="bar-text">200 / 200</span></div>
-  <div class="bar-container"><div id="enemyManaBar" class="bar" style="width:100%;"></div><span id="enemyManaText" class="bar-text">50 / 50</span></div>
-  <div class="bar-container"><div id="enemyIntelligenceBar" class="bar" style="width:0;"></div><span id="enemyIntelligenceText" class="bar-text">IQ 0</span></div>
-
-  <div style="margin-top:15px;">
+  <div class="bar-container">
+    <div id="playerHealthBar" class="bar" style="background:red;width:100%;height:100%;"></div>
+    <span id="playerHealthText" class="bar-text">200 / 200</span>
+  </div>
+  <div class="bar-container" style="margin-top:5px;">
+    <div id="playerManaBar" class="bar" style="background:blue;width:100%;height:100%;"></div>
+    <span id="playerManaText" class="bar-text">50 / 50</span>
+  </div>
+  <p style="margin-top:10px;"><strong>👾 Enemy</strong></p>
+  <div class="bar-container">
+    <div id="enemyHealthBar" class="bar" style="background:red;width:100%;height:100%;"></div>
+    <span id="enemyHealthText" class="bar-text">300 / 300</span>
+  </div>
+  <div class="bar-container" style="margin-top:5px;">
+    <div id="enemyManaBar" class="bar" style="background:blue;width:100%;height:100%;"></div>
+    <span id="enemyManaText" class="bar-text">50 / 50</span>
+  </div>
+  <div class="bar-container" style="margin-top:5px;">
+    <div id="enemyIntelligenceBar" class="bar" style="background:green;width:0;height:100%;"></div>
+    <span id="enemyIntelligenceText" class="bar-text">IQ 0</span>
+  </div>
+  <div style="margin-top:10px;">
     <button onclick="playerAction('Attack')">Attack</button>
     <button onclick="playerAction('Defend')">Defend</button>
     <button onclick="playerAction('Special')">Special (-30 MP)</button>
     <button onclick="playerAction('Heal')">Heal (+20 HP, -20 MP)</button>
     <button onclick="resetGame()">Reset</button>
   </div>
-
   <div id="battleLog"></div>
 </div>
 
-<div id="alertBox"></div>
+<script src="rpgScript.js"></script>
 
+<!-- Navigation Menu -->
 <div id="navMenu">
   <button onclick="location.href='upgrade.html'">🛠 Upgrade</button>
-  <button onclick="location.href='rpgFlip.html'">🎲 Flip Coin</button>
 </div>
-
-<script src="rpgScript.js"></script>
 
 </body>
 </html>
