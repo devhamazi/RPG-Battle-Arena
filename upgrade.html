@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPG Upgrade Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: 'Space Grotesk', sans-serif;
+}
+.bg-glass {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.bar-glow {
+  box-shadow: 0 0 8px rgba(255,255,255,0.2), 0 0 15px rgba(0, 255, 255, 0.1);
+  transition: all 0.5s;
+}
+/* New CSS for clearer visual differentiation */
+.upgrade-glow-cyan { --tw-shadow-color: rgba(6, 182, 212, 0.5); box-shadow: 0 0 10px var(--tw-shadow-color); }
+.upgrade-glow-purple { --tw-shadow-color: rgba(168, 85, 247, 0.5); box-shadow: 0 0 10px var(--tw-shadow-color); }
+.upgrade-glow-green { --tw-shadow-color: rgba(34, 197, 94, 0.5); box-shadow: 0 0 10px var(--tw-shadow-color); }
+.upgrade-glow-yellow { --tw-shadow-color: rgba(250, 204, 21, 0.5); box-shadow: 0 0 10px var(--tw-shadow-color); }
+</style>
+</head>
+<body class="bg-[#001f3f] min-h-screen flex flex-col items-center justify-start p-6 text-white">
+
+<h1 class="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-lg">RPG Upgrade Dashboard</h1>
+<p class="text-lg md:text-xl mb-8">💰 Tokens: <span id="walletBalance" class="font-bold text-cyan-400">0</span></p>
+
+<div class="w-full max-w-lg bg-glass rounded-2xl p-6 mb-4 shadow-lg upgrade-glow-cyan hover:scale-[1.02] transition-transform duration-300">
+  <div class="flex items-center justify-between gap-3 mb-3">
+    <h2 class="text-2xl font-bold">Attack Power (+% Damage)</h2>
+    <span class="text-lg text-cyan-400 font-bold">LVL <span id="attackLevelNum">0</span></span>
+  </div>
+  <p class="mb-2 text-sm text-gray-400">Current Bonus: <span id="attackLevel" class="font-bold text-cyan-300">0%</span></p>
+  <div class="relative h-4 bg-gray-800 rounded-lg overflow-hidden mb-3">
+    <div id="attackBar" class="absolute h-full bg-gradient-to-r from-cyan-500 to-blue-500 bar-glow transition-all duration-500"></div>
+  </div>
+  <div class="flex items-center justify-between">
+    <span class="font-bold">Cost: <span id="attackCost">200</span> tokens</span>
+    <button onclick="buyUpgrade('attack')" class="bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-2 px-4 rounded-xl shadow-md transition-all">Upgrade</button>
+  </div>
+</div>
+
+<div class="w-full max-w-lg bg-glass rounded-2xl p-6 mb-4 shadow-lg upgrade-glow-purple hover:scale-[1.02] transition-transform duration-300">
+  <div class="flex items-center justify-between gap-3 mb-3">
+    <h2 class="text-2xl font-bold">Special Power (x Multiplier)</h2>
+    <span class="text-lg text-purple-400 font-bold">LVL <span id="specialLevelNum">0</span></span>
+  </div>
+  <p class="mb-2 text-sm text-gray-400">Current Multiplier: <span id="specialLevel" class="font-bold text-purple-300">x1.0</span></p>
+  <div class="relative h-4 bg-gray-800 rounded-lg overflow-hidden mb-3">
+    <div id="specialBar" class="absolute h-full bg-gradient-to-r from-purple-500 to-pink-600 bar-glow transition-all duration-500"></div>
+  </div>
+  <div class="flex items-center justify-between">
+    <span class="font-bold">Cost: <span id="specialCost">500</span> tokens</span>
+    <button onclick="buyUpgrade('special')" class="bg-purple-500 hover:bg-pink-600 text-black font-bold py-2 px-4 rounded-xl shadow-md transition-all">Upgrade</button>
+  </div>
+</div>
+
+<div class="w-full max-w-lg bg-glass rounded-2xl p-6 mb-4 shadow-lg upgrade-glow-green hover:scale-[1.02] transition-transform duration-300">
+  <div class="flex items-center justify-between gap-3 mb-3">
+    <h2 class="text-2xl font-bold">Defense (+2 Def per LVL)</h2>
+    <span class="text-lg text-green-400 font-bold">LVL <span id="defenseLevelNum">0</span></span>
+  </div>
+  <p class="mb-2 text-sm text-gray-400">Current Bonus: <span id="defenseLevel" class="font-bold text-green-300">+0 Def</span></p>
+  <div class="relative h-4 bg-gray-800 rounded-lg overflow-hidden mb-3">
+    <div id="defenseBar" class="absolute h-full bg-gradient-to-r from-green-500 to-lime-500 bar-glow transition-all duration-500"></div>
+  </div>
+  <div class="flex items-center justify-between">
+    <span class="font-bold">Cost: <span id="defenseCost">150</span> tokens</span>
+    <button onclick="buyUpgrade('defense')" class="bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded-xl shadow-md transition-all">Upgrade</button>
+  </div>
+</div>
+
+<div class="w-full max-w-lg bg-glass rounded-2xl p-6 mb-6 shadow-lg upgrade-glow-yellow hover:scale-[1.02] transition-transform duration-300">
+  <div class="flex items-center justify-between gap-3 mb-3">
+    <h2 class="text-2xl font-bold">Passive MP Regen (+MP/sec)</h2>
+    <span class="text-lg text-yellow-400 font-bold">LVL <span id="regenLevelNum">0</span></span>
+  </div>
+  <p class="mb-2 text-sm text-gray-400">Current Bonus: <span id="regenLevel" class="font-bold text-yellow-300">+0 MP/s</span></p>
+  <div class="relative h-4 bg-gray-800 rounded-lg overflow-hidden mb-3">
+    <div id="regenBar" class="absolute h-full bg-gradient-to-r from-yellow-500 to-orange-500 bar-glow transition-all duration-500"></div>
+  </div>
+  <div class="flex items-center justify-between">
+    <span class="font-bold">Cost: <span id="regenCost">100</span> tokens</span>
+    <button onclick="buyUpgrade('passiveRegen')" class="bg-yellow-500 hover:bg-orange-500 text-black font-bold py-2 px-4 rounded-xl shadow-md transition-all">Upgrade</button>
+  </div>
+</div>
+
+
+<button onclick="goBackToGame()" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition-all mb-8">⬅ Back to Game</button>
+
+<script>
+const PLAYER_ID = "player123"; 
+const BASE_URL = "https://rpg-storage-server.onrender.com/players";
+const MAX_LEVEL = 10; // Max level for most upgrades
+
+// Unified game state, expanded to match rpgScript.js
+let gameState = {
+  wallet: { tokens: 500 },
+  upgrades: {
+    attack: 0, 
+    special: 0,
+    defense: 0,
+    passiveRegen: 0
+  }
+};
+
+// --- COST FUNCTIONS ---
+
+// Attack: 10% damage bonus per level. Cost scales linearly/exponentially up to max.
+// Level 0: 200, Level 1: 400, Level 2: 600, ... Level 9: 2000
+function getAttackCost(level) {
+  // Linear scaling up to a cap (e.g., Level 9 to 10 is 2000)
+  return level >= MAX_LEVEL ? 'MAX' : (level + 1) * 200;
+}
+
+// Special: Multiplier increase per level. Cost scales exponentially.
+// Level 0: 500, Level 1: 1000, Level 2: 2000, Level 3: 4000
+function getSpecialCost(level) {
+  return level >= MAX_LEVEL ? 'MAX' : 500 * Math.pow(2, level);
+}
+
+// Defense: Flat defense increase. Cost scales based on level squared (quadratic).
+// Level 0: 150, Level 1: 300, Level 2: 600, Level 3: 1050
+function getDefenseCost(level) {
+  return level >= MAX_LEVEL ? 'MAX' : 150 * (level + 1) * 1.5;
+}
+
+// Passive Regen: MP/sec increase. Cost scales linearly.
+// Level 0: 100, Level 1: 200, Level 2: 300, Level 3: 400
+function getRegenCost(level) {
+  return level >= MAX_LEVEL ? 'MAX' : 100 * (level + 1);
+}
+
+const costFunctions = {
+  attack: getAttackCost,
+  special: getSpecialCost,
+  defense: getDefenseCost,
+  passiveRegen: getRegenCost
+};
+
+
+// --- CORE FUNCTIONS ---
+
+async function loadPlayerData() {
+  try {
+    const res = await fetch(`${BASE_URL}/${PLAYER_ID}`);
+    const data = await res.json();
+
+    gameState.wallet.tokens = data.tokens ?? 500;
+    gameState.upgrades.attack = data.attackUpgrade ?? 0;
+    gameState.upgrades.special = data.specialUpgrade ?? 0;
+    gameState.upgrades.defense = data.defenseUpgrade ?? 0;
+    gameState.upgrades.passiveRegen = data.passiveRegen ?? 0;
+
+    updateUI();
+  } catch(err) {
+    console.error("Error loading player data:", err);
+  }
+}
+
+async function savePlayerData() {
+  try {
+    const payload = {
+      tokens: gameState.wallet.tokens,
+      attackUpgrade: gameState.upgrades.attack,
+      specialUpgrade: gameState.upgrades.special,
+      defenseUpgrade: gameState.upgrades.defense,
+      passiveRegen: gameState.upgrades.passiveRegen
+    };
+    await fetch(`${BASE_URL}/${PLAYER_ID}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch(err) {
+    console.error("Error saving player data:", err);
+  }
+}
+
+function updateUI() {
+  document.getElementById('walletBalance').innerText = gameState.wallet.tokens;
+  
+  // Helper to update bars/levels
+  const updateUpgrade = (name, level, displayFunc) => {
+    const levelElement = document.getElementById(`${name}Level`);
+    const levelNumElement = document.getElementById(`${name}LevelNum`);
+    const barElement = document.getElementById(`${name}Bar`);
+    const costElement = document.getElementById(`${name}Cost`);
+    
+    // Update visuals
+    levelElement.innerText = displayFunc(level);
+    levelNumElement.innerText = level;
+    barElement.style.width = Math.min(level / MAX_LEVEL * 100, 100) + '%';
+    
+    // Update cost
+    const cost = costFunctions[name](level);
+    costElement.innerText = cost;
+    
+    // Disable button if maxed
+    const button = costElement.closest('.flex').querySelector('button');
+    if (cost === 'MAX') {
+      button.innerText = 'MAX';
+      button.disabled = true;
+      button.classList.remove('hover:bg-cyan-600', 'hover:bg-pink-600', 'hover:bg-green-600', 'hover:bg-orange-500');
+      button.classList.add('bg-gray-500', 'cursor-not-allowed');
+    } else {
+      button.innerText = 'Upgrade';
+      button.disabled = false;
+      button.classList.remove('bg-gray-500', 'cursor-not-allowed');
+    }
+  };
+
+  // 1. Attack
+  updateUpgrade('attack', gameState.upgrades.attack, (level) => `+${level * 10}% Damage`);
+
+  // 2. Special
+  updateUpgrade('special', gameState.upgrades.special, (level) => `x${(1 + level * 0.5).toFixed(1)} Multiplier`);
+  
+  // 3. Defense
+  updateUpgrade('defense', gameState.upgrades.defense, (level) => `+${level * 2} Def`);
+
+  // 4. Passive Regen
+  updateUpgrade('passiveRegen', gameState.upgrades.passiveRegen, (level) => `+${level} MP/s`);
+}
+
+// Unified Upgrade function
+async function buyUpgrade(upgradeType) {
+  const currentLevel = gameState.upgrades[upgradeType];
+  
+  if (currentLevel >= MAX_LEVEL) {
+    alert('Max upgrade level reached!');
+    return;
+  }
+  
+  const cost = costFunctions[upgradeType](currentLevel);
+
+  if(gameState.wallet.tokens >= cost){
+    gameState.wallet.tokens -= cost;
+    gameState.upgrades[upgradeType]++;
+    
+    updateUI();
+    await savePlayerData();
+    
+    let msg = '';
+    switch(upgradeType) {
+      case 'attack': msg = `Attack upgraded to +${gameState.upgrades.attack * 10}% Damage!`; break;
+      case 'special': msg = `Special Power upgraded to level ${gameState.upgrades.special}!`; break;
+      case 'defense': msg = `Defense upgraded to +${gameState.upgrades.defense * 2} Defense!`; break;
+      case 'passiveRegen': msg = `Passive Regen upgraded to +${gameState.upgrades.passiveRegen} MP/s!`; break;
+    }
+    alert(msg);
+  } else {
+    alert(`Not enough tokens! Need ${cost} tokens.`);
+  }
+}
+
+// Back to game
+function goBackToGame() {
+  // Note: Ensure your main game file is named rpg.html
+  window.location.href = 'rpg.html';
+}
+
+// Initialize page
+window.addEventListener('DOMContentLoaded', loadPlayerData);
+</script>
+
+</body>
+</html>

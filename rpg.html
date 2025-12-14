@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPG Battle Arena - Perfected UI</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    /* === FONT ASSIGNMENTS === */
+    h1 {
+        font-family: 'Orbitron', sans-serif !important; 
+        color: #F0F0F0 !important; 
+        font-weight: 900;
+        text-shadow: 0 0 5px #F0F0F0;
+    }
+
+    /* === BODY FONT (Kept Roboto Mono for readability) === */
+    body {
+        font-family: 'Roboto Mono', monospace;
+        color: var(--white-primary);
+        background-size: cover;
+        background-position: center center;
+        background-attachment: fixed;
+        position: relative;
+    }
+    
+    /* Dark Overlay - Deep Navy */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(10, 25, 47, 0.95);
+        z-index: -1;
+    }
+
+    /* Scrollbar for Battle Log */
+    #battleLog::-webkit-scrollbar { width: 4px; }
+    #battleLog::-webkit-scrollbar-thumb { background-color: #555; border-radius: 4px; }
+    #battleLog::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+    
+    /* Animation for log entries */
+    @keyframes slideInFade {
+      from { transform: translateY(8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    #battleLog p {
+        animation: slideInFade 0.3s ease-out forwards;
+        margin-bottom: 6px;
+    }
+
+    /* Consistent Button Styling */
+    .action-button {
+        transition: all 0.15s ease-in-out;
+        width: 100%;
+        font-size: clamp(12px, 3vw, 14px);
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        font-weight: bold; 
+    }
+    .action-button:hover {
+        opacity: 0.9;
+        transform: scale(1.03);
+    }
+    .action-button:active {
+        transform: scale(0.97);
+        box-shadow: none;
+    }
+    .action-button:disabled {
+        background: #333 !important;
+        box-shadow: none !important;
+        transform: none !important;
+        cursor: not-allowed;
+        color: #777;
+        opacity: 0.8;
+    }
+
+    /* Attack Button Glamour */
+    .attack-glamour-button {
+        border: 2px solid #F0F0F0; 
+        box-shadow: 0 0 15px rgba(231, 76, 60, 0.9); 
+        background: linear-gradient(to bottom, #E74C3C, #deep-red); 
+        color: white; 
+        animation: pulseText 1.5s infinite alternate; 
+    }
+    .attack-glamour-button:hover {
+        box-shadow: 0 0 25px rgba(231, 76, 60, 1), 0 0 40px rgba(231, 76, 60, 0.5);
+        transform: scale(1.05);
+    }
+    @keyframes pulseText {
+        from { text-shadow: 0 0 5px #F0F0F0; }
+        to { text-shadow: 0 0 10px #F0F0F0, 0 0 20px #E74C3C; }
+    }
+
+    /* Scoreboard - PURE FLOATING TEXT (No Border, No Blur) */
+    #scoreboard {
+        background-color: transparent !important; /* No background */
+        box-shadow: none !important;
+        border: none !important;
+        padding-top: 0.5rem; /* Reduce top padding for mobile space */
+        padding-bottom: 0.5rem;
+    }
+    #scoreboard p, #scoreboard span, #scoreboard strong {
+        color: white !important;
+        font-size: 13px;
+        line-height: 1.2;
+    }
+    #scoreboard span {
+        font-size: 15px;
+    }
+    /* New: Added subtle glow animation for scoreboard text */
+    @keyframes subtleGlow {
+        0% { text-shadow: 0 0 2px rgba(255, 255, 255, 0.6); }
+        50% { text-shadow: 0 0 6px rgba(255, 255, 255, 0.8); }
+        100% { text-shadow: 0 0 2px rgba(255, 255, 255, 0.6); }
+    }
+    #scoreboard p, #scoreboard span, #scoreboard strong {
+         animation: subtleGlow 4s infinite ease-in-out;
+    }
+    
+    /* === BAR SPARKLING EFFECT (NEW) === */
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    
+    .bar {
+        /* Base styles for the shimmer */
+        background-size: 200% 100%;
+        background-repeat: no-repeat;
+        animation: shimmer 5s infinite linear;
+        position: relative;
+    }
+    
+    /* === FIXED BAR COLORS (NO TAILWIND VARS, NO OVERRIDES) === */
+
+#playerHealthBar,
+#enemyHealthBar {
+    background: linear-gradient(
+        90deg,
+        #E74C3C 0%,
+        #E74C3C 60%,
+        rgba(255,255,255,0.25) 75%,
+        #E74C3C 100%
+    );
+    background-size: 200% 100%;
+}
+
+#playerManaBar,
+#enemyManaBar {
+    background: linear-gradient(
+        90deg,
+        #6D28D9 0%,
+        #6D28D9 60%,
+        rgba(255,255,255,0.25) 75%,
+        #6D28D9 100%
+    );
+    background-size: 200% 100%;
+}
+
+#enemyIntelligenceBar {
+    background: linear-gradient(
+        90deg,
+        #10B981 0%,
+        #10B981 60%,
+        rgba(255,255,255,0.3) 75%,
+        #10B981 100%
+    );
+    background-size: 200% 100%;
+}
+    
+    /* Ensure text is white and clean */
+    .bar-text {
+        font-family: 'Roboto Mono', monospace; /* Keep consistent font */
+        color: white !important;
+        font-weight: bold;
+    }
+</style>
+
+</head>
+<body class="min-h-screen">
+
+<h1 class="text-3xl sm:text-4xl md:text-5xl text-center pt-8 tracking-wider font-bold">
+    RPG BATTLE ARENA <i class="fa-solid fa-swords text-red-accent"></i>
+</h1>
+
+<div id="scoreboard" 
+     class="fixed top-2 left-2 sm:top-4 sm:left-4 p-3 rounded-lg z-20 transition-all duration-300">
+  
+  <p><strong class="font-bold">Player Wins:</strong> <span id="playerWins">0</span></p>
+  <p><strong class="font-bold">Enemy Wins:</strong> <span id="enemyWins">0</span></p>
+  <p><strong class="font-bold">Score:</strong> <span id="score" class="text-yellow-300">0</span></p>
+  <p><strong class="font-bold">AI IQ:</strong> <span id="aiIQ" class="text-red-accent">0</span></p>
+  <p><strong class="font-bold">💰 Tokens:</strong> <span id="walletBalance">0</span></p>
+</div>
+
+<div id="gameArea" 
+     class="w-11/12 max-w-md mx-auto mt-8 p-5 md:p-8 bg-gray-900/90 rounded-xl 
+            shadow-2xl shadow-black/50 border border-gray-700">
+    
+    <div class="mb-6">
+        <p class="text-base sm:text-lg font-bold mb-2 text-white-primary"><i class="fa-solid fa-user text-hp-red"></i> Player</p>
+        
+        <div class="bar-container relative h-6 bg-gray-700 rounded-full mb-3 overflow-hidden border border-hp-red shadow-inner">
+            <div id="playerHealthBar" class="bar h-full transition-all duration-500 ease-out" style="width:100%;"></div>
+            <span id="playerHealthText" class="bar-text absolute inset-0 flex items-center justify-center font-extrabold text-xs text-white drop-shadow-lg">200 / 200</span>
+        </div>
+        
+        <div class="bar-container relative h-5 bg-gray-700 rounded-full overflow-hidden border border-mana-dark-blue shadow-inner">
+            <div id="playerManaBar" class="bar h-full transition-all duration-500 ease-out" style="width:100%;"></div>
+            <span id="playerManaText" class="bar-text absolute inset-0 flex items-center justify-center font-bold text-xs text-white">50 / 50</span>
+        </div>
+    </div>
+    
+    <div class="h-px bg-gray-700 my-6"></div>
+
+    <div class="mb-6">
+        <p class="text-base sm:text-lg font-bold mb-2 text-red-accent"><i class="fa-solid fa-skull-crossbones text-red-accent"></i> Enemy</p>
+        
+        <div class="bar-container relative h-6 bg-gray-700 rounded-full mb-3 overflow-hidden border border-hp-red shadow-inner">
+            <div id="enemyHealthBar" class="bar h-full transition-all duration-500 ease-out" style="width:100%;"></div>
+            <span id="enemyHealthText" class="bar-text absolute inset-0 flex items-center justify-center font-extrabold text-xs text-white drop-shadow-lg">200 / 200</span>
+        </div>
+        
+        <div class="bar-container relative h-5 bg-gray-700 rounded-full mb-3 overflow-hidden border border-mana-dark-blue shadow-inner">
+            <div id="enemyManaBar" class="bar h-full transition-all duration-500 ease-out" style="width:100%;"></div>
+            <span id="enemyManaText" class="bar-text absolute inset-0 flex items-center justify-center font-bold text-xs text-white">50 / 50</span>
+        </div>
+
+        <div class="bar-container relative h-4 bg-gray-700 rounded-full overflow-hidden border border-green-500 shadow-inner">
+            <div id="enemyIntelligenceBar" class="bar h-full transition-all duration-500 ease-out">
+            <span id="enemyIntelligenceText" class="bar-text absolute inset-0 flex items-center justify-center font-bold text-xs text-white">IQ 0</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
+        <button onclick="playerAction('Attack')" class="action-button rounded-lg attack-glamour-button">
+            <i class="fa-solid fa-bolt fa-lg"></i> ATTACK
+        </button>
+        <button onclick="playerAction('Defend')" class="action-button bg-gradient-to-b from-gray-500 to-gray-700 text-white rounded-lg">
+            <i class="fa-solid fa-shield-halved"></i> Defend
+        </button>
+        <button onclick="playerAction('Special')" class="action-button bg-gradient-to-b from-red-800 to-red-900 text-white rounded-lg">
+            <i class="fa-solid fa-fire-flame-curved"></i> Special (-30 MP)
+        </button>
+        <button onclick="playerAction('Heal')" class="action-button bg-gradient-to-b from-green-500 to-green-700 text-white rounded-lg">
+            <i class="fa-solid fa-hand-holding-medical"></i> Heal (-20 MP)
+        </button>
+        <button onclick="resetGame()" class="action-button bg-gray-600 hover:bg-gray-500 text-white rounded-lg">
+            <i class="fa-solid fa-arrows-rotate"></i> Reset
+        </button>
+    </div>
+
+    <div id="battleLog" 
+         class="mt-6 p-3 bg-black/50 rounded-lg h-32 md:h-40 overflow-y-auto text-xs sm:text-sm border border-gray-700 text-white-primary">
+    </div>
+</div>
+
+<div id="alertBox" 
+     class="fixed top-16 sm:top-20 left-1/2 -translate-x-1/2 p-3 bg-red-accent/90 border-2 border-white rounded-lg 
+            font-bold text-white opacity-0 transition-opacity duration-300 z-50 text-center text-sm">
+</div>
+
+<div id="navMenu" 
+     class="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 sm:space-x-4 z-30">
+    <a href="upgrade.html" class="nav-button bg-gradient-to-b from-indigo-500 to-indigo-700 hover:from-indigo-400 
+              text-white font-bold py-3 px-4 sm:px-6 rounded-full shadow-xl shadow-indigo-700/50 text-xs sm:text-sm transition-all duration-150 ease-in-out">
+        <i class="fa-solid fa-hammer"></i> Upgrade
+    </a>
+    <a href="rpgFlip.html" class="nav-button bg-gradient-to-b from-amber-500 to-amber-700 hover:from-amber-400 
+              text-black font-bold py-3 px-4 sm:px-6 rounded-full shadow-xl shadow-amber-700/50 text-xs sm:text-sm transition-all duration-150 ease-in-out">
+        <i class="fa-solid fa-dice"></i> Flip Coin
+    </a>
+</div>
+
+<script src="rpgScript.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'navy-primary': '#0A192F',
+        'red-accent': '#E74C3C',
+        'white-primary': '#F0F0F0',
+        'deep-red': '#991b1b',
+        'hp-red': '#E74C3C',
+        'mana-dark-blue': '#2C3E50',
+      },
+      boxShadow: {
+        'red-glow': '0 0 15px rgba(231, 76, 60, 0.7)',
+      }
+    }
+  }
+}
+</script>
+
+</body>
+</html>

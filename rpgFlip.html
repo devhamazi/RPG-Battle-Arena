@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin Flip RPG</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at top left, #0f0c29, #302b63, #24243e);
+    color: white;
+    overflow: hidden;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 3rem;
+    text-transform: uppercase;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff;
+    margin-bottom: 1rem;
+    animation: glow 2s infinite alternate;
+  }
+
+  @keyframes glow {
+    from { text-shadow: 0 0 5px #0ff, 0 0 10px #0ff; }
+    to { text-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 0 0 60px #0ff; }
+  }
+
+  .scoreboard {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid #0ff;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #0ff66a;
+  }
+
+  /* Coin Styling and Animation */
+  .coin {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 4px solid gold;
+    background: radial-gradient(circle at 30% 30%, #ffe066, #ffb700);
+    color: black;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 20px gold, 0 0 40px orange;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  
+  .flipping {
+    animation: flip-3d 1.5s ease-out forwards;
+  }
+
+  @keyframes flip-3d {
+    0% { transform: rotateY(0deg) scale(1); }
+    50% { transform: rotateY(1800deg) scale(1.1); background: radial-gradient(circle at 30% 30%, #ffd700, #daa520); } /* 5 full rotations */
+    100% { transform: rotateY(1980deg) scale(1); } /* 5.5 rotations to end on the opposite side */
+  }
+  
+  .heads { background: radial-gradient(circle at 30% 30%, #ffe066, #ffb700); }
+  .tails { background: radial-gradient(circle at 30% 30%, #ff8c00, #ff4500); }
+
+  .result-box {
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding: 15px 25px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 15px #0ff, 0 0 25px #0ff66a;
+    text-align: center;
+    min-width: 320px;
+  }
+
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .bet-input {
+      padding: 10px;
+      font-size: 1rem;
+      width: 100%;
+      border-radius: 8px;
+      border: 2px solid #0ff;
+      text-align: center;
+      background: rgba(255,255,255,0.05);
+      color: white;
+      outline: none;
+  }
+
+  .guess-buttons {
+      display: flex;
+      justify-content: space-around;
+      gap: 10px;
+      width: 100%;
+  }
+
+  button {
+    padding: 10px 25px;
+    font-size: 1rem;
+    border-radius: 8px;
+    font-weight: bold;
+    border: 2px solid #0ff;
+    background: linear-gradient(45deg, #0ff, #00d4ff);
+    color: black;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 10px #0ff, 0 0 20px #0ff66a;
+  }
+
+  button:hover:not(:disabled) {
+    background: linear-gradient(45deg, #00d4ff, #0ff);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #0ff, 0 0 40px #0ff66a;
+  }
+  
+  button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+  }
+
+  .guess-btn {
+      flex: 1;
+  }
+
+</style>
+</head>
+<body>
+
+<h1>Coin Flip RPG</h1>
+
+<div class="scoreboard">
+  <span>Wins: <span id="wins">0</span></span>
+  <span>Losses: <span id="losses">0</span></span>
+  <span>Tokens: <span id="tokens" class="text-yellow-400">0</span></span>
+</div>
+
+<div class="coin" id="coin">?</div>
+
+<div class="result-box" id="resultBox">Enter your bet and choose Heads or Tails.</div>
+
+<div class="input-container">
+    <input type="number" id="betInput" class="bet-input" placeholder="Enter your bet (min 10)" value="10" min="10">
+    
+    <div class="guess-buttons">
+        <button id="guessHeadsBtn" class="guess-btn" data-guess="heads">Heads</button>
+        <button id="guessTailsBtn" class="guess-btn" data-guess="tails">Tails</button>
+    </div>
+</div>
+
+<button id="backToGameBtn" class="mt-4 bg-gray-800 hover:bg-gray-700 text-white border-2 border-cyan-400">⬅ Back to RPG</button>
+
+<script>
+  const PLAYER_ID = "player123"; // same ID as your RPG game
+  const BASE_URL = "https://rpg-storage-server.onrender.com/players";
+  const MIN_BET = 10;
+
+  let wallet = { tokens: 0 };
+  let wins = 0, losses = 0;
+  let isFlipping = false;
+
+  const winsSpan = document.getElementById('wins');
+  const lossesSpan = document.getElementById('losses');
+  const tokensSpan = document.getElementById('tokens');
+  const coinDiv = document.getElementById('coin');
+  const resultBox = document.getElementById('resultBox');
+  const betInput = document.getElementById('betInput');
+  const guessHeadsBtn = document.getElementById('guessHeadsBtn');
+  const guessTailsBtn = document.getElementById('guessTailsBtn');
+  const backBtn = document.getElementById('backToGameBtn');
+
+
+  /* === Load/Save wallet from backend === */
+  async function loadWallet() {
+    try {
+      const res = await fetch(`${BASE_URL}/${PLAYER_ID}`);
+      const data = await res.json();
+      wallet.tokens = data.tokens ?? 1000;
+      updateTokensDisplay();
+      betInput.setAttribute('max', wallet.tokens);
+    } catch(err) {
+      console.error("Error loading wallet:", err);
+    }
+  }
+
+  async function saveWallet() {
+    try {
+      const payload = { tokens: wallet.tokens };
+      await fetch(`${BASE_URL}/${PLAYER_ID}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch(err) {
+      console.error("Error saving wallet:", err);
+    }
+  }
+
+  function updateTokensDisplay() {
+    tokensSpan.textContent = wallet.tokens;
+  }
+  
+  function setControls(disabled) {
+      isFlipping = disabled;
+      betInput.disabled = disabled;
+      guessHeadsBtn.disabled = disabled;
+      guessTailsBtn.disabled = disabled;
+  }
+
+  function flipCoin(guess) {
+    if (isFlipping) return;
+
+    const betAmount = parseInt(betInput.value, 10);
+    
+    // 1. Validation
+    if (isNaN(betAmount) || betAmount < MIN_BET) {
+        resultBox.textContent = `Bet must be a number of ${MIN_BET} or more.`;
+        return;
+    }
+    if (betAmount > wallet.tokens) {
+        resultBox.textContent = `You only have ${wallet.tokens} tokens! Reduce your bet.`;
+        return;
+    }
+
+    setControls(true);
+    
+    // 2. Setup visual flip
+    coinDiv.classList.remove('heads', 'tails');
+    coinDiv.textContent = "?";
+    coinDiv.classList.add('flipping');
+    resultBox.textContent = `Betting ${betAmount} on ${guess.toUpperCase()}... 🚀`;
+
+    // 3. Determine result and update state after animation
+    setTimeout(async ()=>{
+      coinDiv.classList.remove('flipping');
+      
+      const flipResult = Math.random() < 0.5 ? 'heads' : 'tails';
+      
+      coinDiv.textContent = flipResult.charAt(0).toUpperCase() + flipResult.slice(1);
+      
+      let outcomeMessage;
+      
+      if(guess === flipResult){
+        // Player wins
+        wins++;
+        wallet.tokens += betAmount;
+        coinDiv.classList.add('heads');
+        outcomeMessage = `✅ WIN! Coin was ${flipResult.toUpperCase()}. You gained ${betAmount} tokens.`;
+      } else {
+        // Player loses
+        losses++;
+        wallet.tokens -= betAmount;
+        coinDiv.classList.add('tails');
+        outcomeMessage = `❌ LOSS! Coin was ${flipResult.toUpperCase()}. You lost ${betAmount} tokens.`;
+      }
+
+      // Update UI and save
+      resultBox.textContent = outcomeMessage;
+      winsSpan.textContent = wins;
+      lossesSpan.textContent = losses;
+      updateTokensDisplay();
+      betInput.setAttribute('max', wallet.tokens); // Update max bet
+      
+      await saveWallet();
+
+      setControls(false);
+
+    }, 1500); // Duration matches CSS animation time
+  }
+
+  // Event Listeners for Guess Buttons
+  guessHeadsBtn.addEventListener('click', () => flipCoin('heads'));
+  guessTailsBtn.addEventListener('click', () => flipCoin('tails'));
+  
+  // Event Listener for Back Button
+  backBtn.addEventListener('click', () => {
+    window.location.href = "rpg.html"; // path to your RPG
+  });
+
+  // Load wallet on page load
+  window.addEventListener("DOMContentLoaded", loadWallet);
+</script>
+
+</body>
+</html>
