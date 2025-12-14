@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,50 +7,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RPG Battle Arena</title>
 
-<!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
+  /* Applied the classic RPG font */
   body {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Cinzel', serif;
   }
 
-  /* Full page background with GitHub primary & Unsplash fallback */
+  /* --- RESTORED ORIGINAL BACKGROUND CSS --- */
   body::before {
     content: "";
     position: fixed;
     top:0; left:0;
     width:100%; height:100%;
+    /* These are your original background URLs and settings: */
     background:
       url('https://raw.githubusercontent.com/zaddiii/RPG-Battle-Arena/main/84edee8e-37c2-444f-8638-be7d820a1bd7.jpeg') no-repeat center center fixed,
       url('https://images.unsplash.com/photo-1622714768650-8fef88e73a04?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
     background-size: cover;
-    filter: brightness(0.4);
+    filter: brightness(0.4); /* Your original dark filter value */
     z-index: -1;
   }
+  /* -------------------------------------- */
 
-  /* Loading bar animation */
+  /* Loading bar transition */
   .progress-bar {
     transition: width 0.3s ease-in-out;
   }
 </style>
 </head>
-<body class="bg-neutral-900 flex flex-col items-center justify-center min-h-screen text-white">
+<body class="flex flex-col items-center justify-center min-h-screen text-white">
 
-  <!-- Loading Container -->
-  <div class="flex flex-col items-center space-y-6">
-    <h1 class="text-4xl md:text-6xl font-extrabold text-cyan-400 drop-shadow-lg">RPG Battle Arena</h1>
-    <p class="text-lg md:text-xl text-gray-300">Loading arena...</p>
+  <div class="flex flex-col items-center space-y-6 p-8 bg-black bg-opacity-50 rounded-lg border border-gray-700">
+    
+    <h1 class="text-5xl md:text-7xl font-extrabold text-red-600 tracking-wider uppercase text-shadow-lg" style="text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);">
+        RPG Battle Arena
+    </h1>
+    
+    <p class="text-lg md:text-xl text-gray-300 italic">Loading arena...</p>
 
-    <!-- Loading Bar -->
-    <div class="w-80 md:w-96 bg-gray-700 rounded-full overflow-hidden shadow-lg">
-      <div id="loadingProgress" class="progress-bar h-4 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 w-0"></div>
+    <div class="w-80 md:w-96 bg-gray-700 rounded-full overflow-hidden shadow-lg border border-red-800">
+      
+      <div id="loadingProgress" class="progress-bar h-5 bg-red-600 w-0 shadow-inner"></div>
     </div>
   </div>
 
 <script>
-  // Simulate loading progress
+  // Simulate loading progress - script remains the same
   let progress = 0;
   const loadingProgress = document.getElementById('loadingProgress');
 
